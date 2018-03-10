@@ -1,0 +1,56 @@
+web:
+   image: mobingi/ubuntu-apache2-php7:7.2  
+   restart: always
+   ports:
+      - "85:80"
+   volumes:
+      - /var/www/docker/lampak/php.ini:/etc/php/7.2/apache2/conf.d/30-custom-ak.ini
+      - /var/www/docker/lampak/log/:/var/log
+      - /var/www/docker/lampak/docker/sites:/etc/apache2/sites-enabled
+      - /var/www/docker/lampak/local.dev:/var/www
+   environment:
+      - ALLOW_OVERRIDE=true
+   links:
+      - db:db
+      - mariadb:mariadb
+
+db:
+ image: mysql
+ restart: always
+ volumes:
+  - /var/www/docker/mysql:/var/lib/mysql
+ environment:
+  - MYSQL_ROOT_PASSWORD=root
+  - MYSQL_PORT_3306_TCP_PORT=3344
+
+
+mariadb:
+  image: 'bitnami/mariadb:latest'
+  restart: always
+  volumes:
+    - /var/www/docker/mariadb:/var/lib/mysql
+  environment:
+    - ALLOW_EMPTY_PASSWORD=yes
+    - MARIADB_USER=akasse
+    - MARIADB_DATABASE=laravel
+    - MARIADB_PASSWORD=touba
+
+myapp:
+  tty: true
+  image: 'akasse/laravel5.5:latest'
+  restart: always
+  labels:
+    kompose.service.type: nodeport
+  environment:
+    - DB_HOST=mariadb
+    - DB_USERNAME=akasse
+    - DB_DATABASE=laravel
+    - DB_PASSWORD=touba
+  links:
+    - db:db
+    - mariadb:mariadb
+  ports:
+    - 3000:3000
+  volumes:
+    - /var/www/docker/laravel:/app
+ 
