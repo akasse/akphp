@@ -27,3 +27,9 @@ Route::post('/usersroles','UserController@attachUserRole');
 Route::post('/permissions/add','UserController@attachPermissionak');
 Route::get('/users/{user_id}/roles','UserController@getUserRole');
 Route::get('/roles/{roleParam}','UserController@getPermissions');
+
+
+Route::get('/auth/token','AuthController@token');
+Route::get('/auth/refresh','AuthController@refresh');
+
+//Route::get('/auth/token/invalidate','AuthController@invalidate');

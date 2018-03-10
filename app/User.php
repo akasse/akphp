@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
 class User extends Authenticatable
 {
     use Notifiable;
@@ -30,8 +29,17 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function rolesak()
+    
+    /**
+     * Automatically creates hash for the user password.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setPasswordAttribute($value)
     {
-        return $this->belongsToMany('App\Role', 'role_user','user_id', 'role_id');
+        $this->attributes['password'] = Hash::make($value);
     }
+
+
 }
