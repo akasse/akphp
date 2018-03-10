@@ -9,10 +9,33 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 use Illuminate\Support\Facades\Validator;
-
+use Tymon\JWTAuth\Exceptions\TokenInvalidException ;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException ;
 
 class AuthController extends Controller
 {
+
+    public function signup(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required'
+        ]);
+
+        $user = new User([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => bcrypt($request->input('password'))
+        ]);
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Successfully created user!'
+            ],201);
+    }
+
     //*
     public function token(Request $request) { 
         $credentials = $request->only('email', 'password'); // grab credentials from the request
@@ -68,37 +91,31 @@ class AuthController extends Controller
            return response()->json(
             ['token' => $token], 200);
 
-        } catch (TokenExpiredException $e) {
+        } catch (TokenInvalidException $e) {
+            return response([
+                'error' => 5,
+                'message' => 'Invalide token'
+            ]);
+        }
+        
+    }
+
+
+    public function  invalidate()
+    {
+        $token = JWTAuth::getToken();
+        try {
+            
+            $token = JWTAuth::invalidate($token);
+            return response()->json(
+            ['token' => $token], 200);
+
+        } catch (Exception $e) {
             return response()->json(
                 ['error' => 1,
             'message' => 'Tocken Expirer'], 200); // something went wrong whilst attempting to encode the token
         }
-
-
-        return response([
-                'status' => 'success'
-            ]);
     }
-
-    public function signup(Request $request)
-    {
-        $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required'
-        ]);
-
-        $user = new User([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password'))
-        ]);
-
-        $user->save();
-
-        return response()->json([
-            'message' => 'Successfully created user!'
-            ],201);
-    }
+ 
     
 }

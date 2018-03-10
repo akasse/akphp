@@ -33,3 +33,6 @@ Route::get('/auth/token','AuthController@token');
 Route::get('/auth/refresh','AuthController@refresh');
 
 //Route::get('/auth/token/invalidate','AuthController@invalidate');
+
+
+Route::get('/account','AccountController@index');
