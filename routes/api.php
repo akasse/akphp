@@ -42,8 +42,9 @@ Route::get('/auth/refresh','AuthController@refresh');
 //Route::get('/auth/token/invalidate','AuthController@invalidate');
 
 
+
 Route::get('/account',[
     'as' => 'account',
     'uses' => 'AccountController@index',
-    'middleware' => 'jwt.auth'
+    'middleware' => 'jwt.auth',
 ]);

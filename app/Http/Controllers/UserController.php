@@ -45,9 +45,10 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-      // dd($user->roles());
+   // dd($user->hasRole('admin'));
         return response()->json([
             'error'=> 0,
+            'user'=> $user,
             'data' =>   $user->roles
         ],200);
     }

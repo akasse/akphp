@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use JWTAuth;
+use Entrust;
 
 class AccountController extends Controller
 {
@@ -25,9 +26,14 @@ class AccountController extends Controller
     {
         $user = JWTAuth::toUser();
 
+        if (!Entrust::can('AJOUTER')) {
+            //return Redirect::to('/users');
+        }
+
         return response([
                 'status' => 'success',
-                'data' => $user
+                'data' => $user,
+                'tres' => $user->roles
         ]);
     }
 }
