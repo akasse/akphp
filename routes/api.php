@@ -21,18 +21,29 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //===========Authentification============
 
 Route::apiResource('/users','UserController',
-[ 'only' => ['show', 'index'] ]);
+[ 'only' => ['show', 'index'],
+'middleware' => 'jwt.auth' ]);
 
-Route::post('/usersroles','UserController@attachUserRole');
+Route::post('/usersroles',[
+    'as' => 'userroles',
+    'uses' => 'UserController@attachUserRole',
+    'middleware' => 'jwt.auth'
+   ]);
+
 Route::post('/permissions/add','UserController@attachPermissionak');
 Route::get('/users/{user_id}/roles','UserController@getUserRole');
 Route::get('/roles/{roleParam}','UserController@getPermissions');
 
 
-Route::get('/auth/token','AuthController@token');
+//Route::get('/auth/token','AuthController@token');
+Route::get('/auth/signin','AuthController@signin');
 Route::get('/auth/refresh','AuthController@refresh');
 
 //Route::get('/auth/token/invalidate','AuthController@invalidate');
 
 
-Route::get('/account','AccountController@index');
+Route::get('/account',[
+    'as' => 'account',
+    'uses' => 'AccountController@index',
+    'middleware' => 'jwt.auth'
+]);
