@@ -15,6 +15,9 @@ use Tymon\JWTAuth\Exceptions\TokenBlacklistedException ;
 class AuthController extends Controller
 {
 
+    /**
+     *   Inscription
+    */
     public function signup(Request $request)
     {
         $this->validate($request, [
@@ -36,6 +39,9 @@ class AuthController extends Controller
             ],201);
     }
 
+     /**
+     *   Authentification LOGIN
+    */
     public function signin(Request $request)
     {
         $this->validate($request, [
@@ -59,8 +65,79 @@ class AuthController extends Controller
         ], 200);
     }
 
-    //*
-    public function token(Request $request) { 
+
+
+     /**
+     *   Rafrechissement du Token
+    */
+    public function refresh()
+    {
+        $token = JWTAuth::getToken();
+        
+        try {
+
+           $token = JWTAuth::refresh($token);
+           return response()->json(
+            ['token' => $token], 200);
+
+        }
+        catch (JWTException $e) {
+            return response([
+                'error' => 2,
+                'message' => 'Token Invalide'
+            ]);
+        }
+        
+        
+        
+    }
+
+
+    public function  invalidate()
+    {
+        $token = JWTAuth::getToken();
+        try {
+            
+            $token = JWTAuth::invalidate($token);
+            return response()->json(
+            ['token' => $token], 200);
+
+        } catch (JWTException $e) {
+            return response([
+                'error' => 2,
+                'message' => 'Token Invalide'
+            ]);
+        }
+    }
+
+    /**
+     *   Recuperer le profil de l'utilisateur courrant 
+    */
+
+    public function currentUser(){
+        try{
+            $user = JWTAuth::toUser();
+            
+            return  response()->json([
+            'error' => 1, 
+            'user' => $user,
+            'message' => 'Utilisateur introuvable',
+            
+            'roles' => $user->roles,
+        ], 200); 
+        }catch(JWTException $ex){
+
+            return response()->json([
+                'error' => 5, 
+                'message' => 'Token Invalide'
+            ], 200);
+       }
+    
+         
+     }
+
+     //*
+     public function token(Request $request) { 
         $credentials = $request->only('email', 'password'); // grab credentials from the request
         
         $validator = Validator::make(
@@ -103,42 +180,6 @@ class AuthController extends Controller
             ]);
     }
 
-
-    public function refresh()
-    {
-        $token = JWTAuth::getToken();
-        
-        try {
-
-           $token = JWTAuth::refresh($token);
-           return response()->json(
-            ['token' => $token], 200);
-
-        } catch (TokenInvalidException $e) {
-            return response([
-                'error' => 5,
-                'message' => 'Invalide token'
-            ]);
-        }
-        
-    }
-
-
-    public function  invalidate()
-    {
-        $token = JWTAuth::getToken();
-        try {
-            
-            $token = JWTAuth::invalidate($token);
-            return response()->json(
-            ['token' => $token], 200);
-
-        } catch (Exception $e) {
-            return response()->json(
-                ['error' => 1,
-            'message' => 'Tocken Expirer'], 200); // something went wrong whilst attempting to encode the token
-        }
-    }
  
     
 }

@@ -35,16 +35,29 @@ Route::get('/users/{user_id}/roles','UserController@getUserRole');
 Route::get('/roles/{roleParam}','UserController@getPermissions');
 
 
-//Route::get('/auth/token','AuthController@token');
-Route::get('/auth/signin','AuthController@signin');
-Route::get('/auth/refresh','AuthController@refresh');
-
-//Route::get('/auth/token/invalidate','AuthController@invalidate');
-
-
-
 Route::get('/account',[
     'as' => 'account',
     'uses' => 'AccountController@index',
     'middleware' => 'jwt.auth',
 ]);
+
+
+//  ========Authentification=====
+Route::group(['prefix' => 'auth','middleware' => 'jwt.auth'], function(){
+
+	Route::get('/profil',[
+        'as' => 'auth.profil',
+        'uses' => 'AuthController@currentUser'
+    ]);
+
+    Route::get('/refresh',[
+        'as' => 'auth.refresh',
+        'uses' => 'AuthController@refresh'
+    ]);
+
+    Route::get('/invalide',[
+        'as' => 'auth.invalide',
+        'uses' => 'AuthController@deletetoken'
+    ]);
+
+  });
